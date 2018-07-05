@@ -22,6 +22,7 @@ public class IPShow extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("IPShow.fxml"));
         
         Scene scene = new Scene(root);
+        stage.setTitle("IPShow");
         
         stage.setScene(scene);
         stage.show();
