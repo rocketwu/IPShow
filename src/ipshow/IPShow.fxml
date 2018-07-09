@@ -8,8 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ipshow.IPShowController">
    <top>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -30,7 +29,7 @@
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
                   <Label text="Dotted Dec IP:" />
-                  <TextField alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="155.0" promptText="169.254.100.100">
+                  <TextField fx:id="dIP" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="155.0" promptText="169.254.100.100">
                      <font>
                         <Font name="Monospaced Regular" size="15.0" />
                      </font>
@@ -43,7 +42,7 @@
                         <Insets left="20.0" />
                      </padding>
                   </Label>
-                  <TextField alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="155.0" promptText="255.255.0.0">
+                  <TextField fx:id="dMask" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="155.0" promptText="255.255.0.0">
                      <font>
                         <Font name="Monospaced Regular" size="15.0" />
                      </font>
@@ -53,14 +52,14 @@
                         <Insets left="20.0" />
                      </padding>
                   </Label>
-                  <TextField alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="50.0" promptText="16">
+                  <TextField fx:id="cidr" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="50.0" promptText="16">
                      <font>
                         <Font name="Monospaced Regular" size="15.0" />
                      </font>
                   </TextField>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <HBox fx:id="HBoxOfBIP" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <children>
                   <Label text="Binary IP:" />
                   <TextField alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="90.0" promptText="10000000">
@@ -97,7 +96,7 @@
                   </TextField>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <HBox fx:id="HBoxOfBMask" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <children>
                   <Label text="Binary Mask: " />
                   <TextField alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="90.0" promptText="11111111">
@@ -105,7 +104,7 @@
                         <Font name="Monospaced Regular" size="15.0" />
                      </font>
                      <HBox.margin>
-                        <Insets left="20.0" />
+                        <Insets left="25.0" />
                      </HBox.margin>
                   </TextField>
                   <TextField alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="90.0" promptText="11111111">
@@ -152,13 +151,13 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                <children>
-                  <Label text="Class: B" />
-                  <Label text="# of Subnets: 1">
+                  <Label fx:id="type" text="Class: B [Special]" />
+                  <Label fx:id="numOfSubnet" text="# of Subnets: 1">
                      <padding>
                         <Insets left="50.0" />
                      </padding>
                   </Label>
-                  <Label text="# of Hosts per Subnet: 65534">
+                  <Label fx:id="numOfHost" text="# of Hosts per Subnet: 65534">
                      <padding>
                         <Insets left="30.0" />
                      </padding>
@@ -167,7 +166,7 @@
             </HBox>
             <TableView maxWidth="-Infinity" prefHeight="200.0" prefWidth="580.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
               <columns>
-                <TableColumn fx:id="c1" editable="false" prefWidth="130.0" resizable="false" text="Subnet IP" />
+                <TableColumn editable="false" prefWidth="130.0" resizable="false" text="Subnet IP" />
                 <TableColumn editable="false" prefWidth="150.0" resizable="false" text="First Host IP" />
                   <TableColumn editable="false" prefWidth="150.0" resizable="false" text="Last Host IP" />
                   <TableColumn editable="false" prefWidth="150.0" resizable="false" text="Broadcast IP" />

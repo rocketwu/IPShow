@@ -24,6 +24,7 @@ public class IPShow extends Application {
         Scene scene = new Scene(root);
         stage.setTitle("IPShow");
         
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
     }
