@@ -63,8 +63,9 @@ public class IPShowController implements Initializable {
         StringTokenizer s=new StringTokenizer(text,".");
         int index=0;
         while(s.hasMoreTokens()){
-            Integer num=Integer.parseInt(s.nextToken());
+            
             try{
+                Integer num=Integer.parseInt(s.nextToken());
                 if (num<0||num>255) {
                     badInput(tf);
                     return;
