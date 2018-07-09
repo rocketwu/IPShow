@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,6 +29,7 @@ public class IPShowController implements Initializable {
     
     @FXML
     private TextField dIP;
+    private String dipText;
     @FXML
     private TextField dMask;
     @FXML
@@ -47,10 +49,47 @@ public class IPShowController implements Initializable {
     @FXML
     private HBox HBoxOfBMask;
     
+    private void dIPInput()
+    {
+        d2b(dIP,bIP);
+        
+    }
     
+    private void d2b (TextField tf, TextField[] tfs){
+        for(TextField btf: tfs){
+            btf.setText(null);      //清空
+        }
+        String text=tf.getText();
+        StringTokenizer s=new StringTokenizer(text,".");
+        int index=0;
+        while(s.hasMoreTokens()){
+            Integer num=Integer.parseInt(s.nextToken());
+            try{
+                if (num<0||num>255) {
+                    badInput(tf);
+                    return;
+                }
+                else{
+                    goodInput(tf);
+                    String binary=("00000000"+Integer.toBinaryString(num));     //给二进制ip补足前缀
+                    tfs[index].setText(binary.substring(binary.length()-8));
+                    index++;
+                }
+            }catch(NumberFormatException ex){
+                badInput(tf);
+                return;
+            }
+        }
+    }
     
+    private void badInput(Node tf){
+        tf.setStyle("-fx-background-color: #FFCCCC");
+    }
     
-    
+    private void goodInput(Node tf){
+        tf.setStyle(null);
+    }
+
 
     @FXML
     public void exit(){
@@ -70,6 +109,11 @@ public class IPShowController implements Initializable {
         BMasks.addAll(HBoxOfBMask.getChildren());
         BMasks.remove(0);
         bMask=BMasks.toArray(new TextField[0]);
+        
+        dIP.textProperty().addListener((observable, oldValue, newValue)->{
+            dIPInput();
+        });//添加监听
+        
     }    
     
 }

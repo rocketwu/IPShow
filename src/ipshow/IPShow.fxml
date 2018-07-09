@@ -179,7 +179,7 @@
       <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" prefHeight="60.0" prefWidth="800.0" spacing="30.0" BorderPane.alignment="CENTER">
          <children>
             <Button mnemonicParsing="false" text="Show Subnet" />
-            <Button mnemonicParsing="false" text="Exit" />
+            <Button mnemonicParsing="false" onAction="#exit" text="Exit" />
          </children>
          <BorderPane.margin>
             <Insets />
