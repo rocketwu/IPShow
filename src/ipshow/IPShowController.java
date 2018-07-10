@@ -55,6 +55,22 @@ public class IPShowController implements Initializable {
         
     }
     
+    private void dMaskInput() {
+        d2b(dMask,bMask);
+        if (checkMask(bMask)) {
+            //goodInput(dMask);
+            mask2cidr();
+        }
+        else{
+            badInput(dMask);
+            for(TextField btf:bMask){
+                btf.setText(null);
+            }
+            cidr.setText(null);
+        }
+        
+    }
+    
     private void d2b (TextField tf, TextField[] tfs){
         for(TextField btf: tfs){
             btf.setText(null);      //清空
@@ -83,12 +99,37 @@ public class IPShowController implements Initializable {
         }
     }
     
+    private boolean checkMask(TextField[] mask){
+        String s="";
+        for(TextField tf:mask){
+            s+=tf.getText();
+        }
+        if (!s.contains("0")) {
+            //no 0s in mask (255.255.255.255)
+            return true;
+        }
+        else{
+            s=s.substring(s.indexOf("0"));
+            return (!s.contains("1"));
+        }
+
+    }
+    
     private void badInput(Node tf){
         tf.setStyle("-fx-background-color: #FFCCCC");
     }
     
     private void goodInput(Node tf){
         tf.setStyle(null);
+    }
+    
+    private void mask2cidr(){
+        String s="";
+        for(TextField tf:bMask){
+            s+=tf.getText();
+        }
+        int i=(s.indexOf("0"));
+        cidr.setText(Integer.toString(i==-1?32:i));
     }
 
 
@@ -115,6 +156,17 @@ public class IPShowController implements Initializable {
             dIPInput();
         });//添加监听
         
+        dMask.textProperty().addListener((observable, oldValue, newValue)->{
+            dMaskInput();
+        });//添加监听
     }    
+
+    @FXML
+    public void testUnit(){
+        String s="123456";
+        s=s.substring(6);
+        System.out.println(s);
+    }
+
     
 }
