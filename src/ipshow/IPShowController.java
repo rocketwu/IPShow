@@ -12,13 +12,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -32,7 +28,6 @@ public class IPShowController implements Initializable {
     
     @FXML
     private TextField dIP;
-    private String dipText;
     @FXML
     private TextField dMask;
     @FXML
@@ -229,6 +224,61 @@ public class IPShowController implements Initializable {
     
     private ChangeListener<String> cidrListener;
     
+    
+    
+    
+    private char getType(String ip){
+        try{
+            Integer.parseInt(ip, 2);
+        }catch(NumberFormatException ex){
+            return ' ';
+        }
+        if(ip.length()!=8) return ' ';
+        
+        char res='A';
+        res+=ip.indexOf("0");
+        res=res<'A'?'E':res;
+        //System.out.println(res+privateOrPublic());
+        
+        return res;
+        
+    }
+    
+    private String privateOrPublic (){
+        String ip=dIP.getText();
+        StringTokenizer s=new StringTokenizer(ip,".");
+        String[] ary=new String[4];
+        int index=0;
+        while(s.hasMoreTokens()){
+            ary[index]=s.nextToken();
+            index++;
+        }
+        
+        try{
+            int ip1=Integer.parseInt(ary[0]);
+            int ip2=Integer.parseInt(ary[1]);
+            switch (ip1){
+                case 10:
+                    return "private";
+                case 172:
+                    if (ip2>=16&&ip2<=31) {
+                        return "private";
+                    }
+                    break;
+                case 192:
+                    if (ip2==168) return "private";
+                    break;
+                default:
+                    return "public";
+            }
+        }catch(NumberFormatException ex){
+            return "";
+        }
+        
+        return "public";
+    }
+    
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //ObservableList<Node> BIPs = HBoxOfBIP.getChildren();
@@ -303,6 +353,14 @@ public class IPShowController implements Initializable {
         for(TextField tf:bMask){
             tf.textProperty().addListener(bMaskListener);
         }
+        
+        bIP[0].textProperty().addListener((ob,ov,nv)->{
+                String s=""+getType(nv);
+                if(s!=" "){
+                    type.setText("Class: "+s+" ["+privateOrPublic()+"] ");
+                }
+            });
+        
     }
     
     @FXML
