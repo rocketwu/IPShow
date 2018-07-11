@@ -5,11 +5,14 @@
  */
 package ipshow;
 
+import java.lang.Thread.State;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -99,11 +102,65 @@ public class IPShowController implements Initializable {
         }
     }
     
+    private void bIPInput(){
+        b2d(bIP,dIP);
+    }
+    
+    private void bMaskInput(){
+        String temp=dMask.getText();
+        b2d(bMask,dMask);
+        if (!checkMask(bMask)) {
+            dMask.setText(temp);
+            for(TextField tf:bMask){
+                badInput(tf);
+            }
+        }
+        else{
+            mask2cidr();
+        }
+    }
+    
+    private void b2d(TextField[] tfs, TextField tf){
+        boolean update=true;
+        String dec="";
+        for(TextField f:tfs){
+            if(f.getText().length()!=8) {
+                badInput(f);
+                update=false;
+                continue;
+            }
+            try{
+                int num=Integer.parseInt(f.getText(), 2);
+                if(num<0||num>255){
+                    badInput(f);
+                    update=false;
+                }else{
+                    dec+=Integer.toString(num)+".";
+                    goodInput(f);
+                }
+            }catch(NumberFormatException ex){
+                badInput(f);
+                update=false;
+            }
+        }
+        if (update) {
+            dec=dec.substring(0, dec.length()-1);
+            tf.setText(dec);
+            
+        }
+        
+    }
+    
     private boolean checkMask(TextField[] mask){
         String s="";
         for(TextField tf:mask){
             s+=tf.getText();
         }
+        
+        if (s.length()!=32){
+            return false;
+        }
+        
         if (!s.contains("0")) {
             //no 0s in mask (255.255.255.255)
             return true;
@@ -115,11 +172,12 @@ public class IPShowController implements Initializable {
 
     }
     
-    private void badInput(Node tf){
+    private void badInput(TextField tf){
+        if(tf.getText().isEmpty()) return;
         tf.setStyle("-fx-background-color: #FFCCCC");
     }
     
-    private void goodInput(Node tf){
+    private void goodInput(TextField tf){
         tf.setStyle(null);
     }
     
@@ -131,6 +189,28 @@ public class IPShowController implements Initializable {
         int i=(s.indexOf("0"));
         cidr.setText(Integer.toString(i==-1?32:i));
     }
+    
+    private void cidrInput(){
+        for(TextField tf:bMask){
+            tf.setText("");
+        }
+        try{
+            int num=Integer.parseInt(cidr.getText());
+            if(num<0||num>32){
+                badInput(cidr);
+                return;
+            }
+            for(int i=0;i<num;i++){
+                bMask[i/8].setText(bMask[i/8].getText()+"1");
+            }
+            for(;num<32;num++){
+                bMask[num/8].setText(bMask[num/8].getText()+"0");
+            }
+            b2d(bMask,dMask);
+        }catch(NumberFormatException ex){
+            badInput(cidr);
+        }
+    }
 
 
     @FXML
@@ -138,6 +218,16 @@ public class IPShowController implements Initializable {
         Stage stage = (Stage) HBoxOfBIP.getScene().getWindow();
         stage.close();
     }
+    
+    private ChangeListener<String> dIPListener;
+    
+    private ChangeListener<String> dMaskListener;
+    
+    private ChangeListener<String> bIPListener;
+    
+    private ChangeListener<String> bMaskListener;
+    
+    private ChangeListener<String> cidrListener;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -152,19 +242,73 @@ public class IPShowController implements Initializable {
         BMasks.remove(0);
         bMask=BMasks.toArray(new TextField[0]);
         
-        dIP.textProperty().addListener((observable, oldValue, newValue)->{
-            dIPInput();
-        });//添加监听
-        
-        dMask.textProperty().addListener((observable, oldValue, newValue)->{
-            dMaskInput();
-        });//添加监听
+        initListener();
     }    
-
+    
+    private void initListener(){
+        dIPListener=(observable, oldValue, newValue)->{
+            for(TextField tf:bIP){
+                tf.textProperty().removeListener(bIPListener);
+             }
+            dIPInput();
+            for(TextField tf:bIP){
+                tf.textProperty().addListener(bIPListener);
+             }
+        };
+        
+        dMaskListener=(observable, oldValue, newValue)->{
+            for(TextField tf:bMask){
+                tf.textProperty().removeListener(bMaskListener);
+            }
+            cidr.textProperty().removeListener(cidrListener);
+            dMaskInput();
+            cidr.textProperty().addListener(cidrListener);
+            for(TextField tf:bMask){
+                tf.textProperty().addListener(bMaskListener);
+            }
+        };
+        
+        bIPListener=(observable, oldValue, newValue)->{
+            dIP.textProperty().removeListener(dIPListener);
+            bIPInput();
+            dIP.textProperty().addListener(dIPListener);
+        };
+        
+        bMaskListener=(observable, oldValue, newValue)->{
+            dMask.textProperty().removeListener(dMaskListener);
+            cidr.textProperty().removeListener(cidrListener);
+            bMaskInput();
+            cidr.textProperty().addListener(cidrListener);
+            dMask.textProperty().addListener(dMaskListener);            
+        };
+        
+        cidrListener=(observable, oldValue, newValue)->{
+            for(TextField tf:bMask){
+                tf.textProperty().removeListener(bMaskListener);
+            }
+            dMask.textProperty().removeListener(dMaskListener);
+            cidrInput();
+            dMask.textProperty().addListener(dMaskListener);
+            for(TextField tf:bMask){
+                tf.textProperty().addListener(bMaskListener);
+            }
+        };
+        
+        dIP.textProperty().addListener(dIPListener);//添加监听        
+        dMask.textProperty().addListener(dMaskListener);//添加监听
+        cidr.textProperty().addListener(cidrListener);
+        for(TextField tf:bIP){
+            tf.textProperty().addListener(bIPListener);
+        }
+        for(TextField tf:bMask){
+            tf.textProperty().addListener(bMaskListener);
+        }
+    }
+    
     @FXML
     public void testUnit(){
-        String s="123456";
-        s=s.substring(6);
+        String s="011012";
+        s=Integer.valueOf(s, 2).toString();
         System.out.println(s);
     }
 
