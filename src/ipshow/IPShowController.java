@@ -202,6 +202,7 @@ public class IPShowController implements Initializable {
                 bMask[num/8].setText(bMask[num/8].getText()+"0");
             }
             b2d(bMask,dMask);
+            goodInput(cidr);
         }catch(NumberFormatException ex){
             badInput(cidr);
         }
@@ -278,6 +279,34 @@ public class IPShowController implements Initializable {
         return "public";
     }
     
+    private long getNumOfSubnet() {
+        char cType=getType(bIP[0].getText());
+        if(checkMask(bMask)){
+            String mask="";
+            long _numOfSubnet=-1;
+            for(TextField tf:bMask){
+                mask+=tf.getText();
+            }
+                switch(cType){
+                case 'A':
+                    mask=mask.substring(8);
+                    _numOfSubnet=(long)Math.pow(2,mask.indexOf("0"));
+                    break;
+                case 'B':
+                    mask=mask.substring(16);
+                    _numOfSubnet=(long)Math.pow(2,mask.indexOf("0"));
+                    break;
+                case 'C':
+                    mask=mask.substring(24);
+                    _numOfSubnet=(long)Math.pow(2,mask.indexOf("0"));
+                    break;
+                default:
+                    _numOfSubnet=-1;
+            }
+            return _numOfSubnet;
+        }
+        return -1;
+    }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -355,20 +384,49 @@ public class IPShowController implements Initializable {
         }
         
         bIP[0].textProperty().addListener((ob,ov,nv)->{
-                String s=""+getType(nv);
-                if(s!=" "){
-                    type.setText("Class: "+s+" ["+privateOrPublic()+"] ");
+                char cType=getType(nv);
+                if(cType!=' '){
+                    type.setText("Class: "+cType+" ["+privateOrPublic()+"] ");
                 }
             });
-        
+        cidr.textProperty().addListener((ob,ov,nv)->{
+            
+            if (!checkMask(bMask)){
+                numOfSubnet.setText("# of Subnets: ");
+                numOfHost.setText("# of Hosts per Subnet: ");
+            }
+            
+            long subnets=getNumOfSubnet();
+            numOfSubnet.setText("# of Subnets: "+(subnets!=-1?subnets:" "));
+            long hosts=getNumOfHosts(subnets);
+            numOfHost.setText("# of Hosts per Subnet: "+(hosts!=-1?hosts:" "));
+        });
+    }
+    
+    private long getNumOfHosts(long subnets){
+        String mask="";
+        if (!checkMask(bMask)||subnets==-1) {
+            return -1;
+        }
+        for(TextField tf:bMask){
+            mask+=tf.getText();
+        }
+        try{
+            mask=mask.substring(mask.indexOf("0"));
+            return (long)Math.pow(2, mask.length())-2;
+        }catch(NumberFormatException ex){
+            return -1;
+        }
     }
     
     @FXML
     public void testUnit(){
-        String s="011012";
-        s=Integer.valueOf(s, 2).toString();
+        String s="0123456";
+        s=s.substring(2);
         System.out.println(s);
     }
+
+
 
     
 }
